@@ -1,5 +1,9 @@
 # 不用 Dev_cpp
 
+> $Author : \mathcal{Red}$
+>
+> 有任何问题请与 ProjektRed@buaa.edu.cn 联系
+
 推荐使用 Clion（配置较简单但软件较大，吃内存）或 vscode（轻量级，但可能需要一定的配置能力）。
 
 如果你一定想用 Dev_cpp 或是不想配置其他编辑器，以下为一些让它变得稍微能用一些的方法：
