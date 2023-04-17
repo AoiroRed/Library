@@ -28,7 +28,6 @@ void print_ele(ele val) {
     printf("%s ", val);
 }
 
-
 typedef struct node {
     ele val;
     struct node *next, *prev;
@@ -89,6 +88,7 @@ void remove_tail(pList);
 void remove_node(pList, pNode);
 void remove_at(pList, int);
 void remove_val(pList, ele);
+void remove_k(pList, ele, int);
 
 pNode cycle_next(pList, pNode);
 pNode cycle_prev(pList, pNode);
@@ -97,8 +97,10 @@ pList copy(pList);
 void reverse(pList);
 void clear(pList);
 void concat(pList, pList);
-char num[10][10] = {"zero", "one", "two",   "three", "four",
-                          "five", "six", "seven", "eight", "nine"};
+pList split(pList, int);
+void delete(pList);
+
+char num[10][10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 int main() {
     pList list = createList();
     for (int i = 0; i < 10; i++) {
@@ -116,6 +118,11 @@ int main() {
     insert_tail(list, "five");
     print_list(list);
     remove_val(list, "five");
+    print_list(list);
+    pList list2 = split(list, 5);
+    print_list(list);
+    print_list(list2);
+    concat(list, list2);
     print_list(list);
     reverse(list);
     print_list(list);
@@ -188,6 +195,17 @@ pNode find_at(pList list, int index) {
         }
     }
     return node;
+}
+
+// count the number of nodes with the value "val"6
+int count(pList list, ele val) {
+    int cnt = 0;
+    list_for_each(list, node) {
+        if (cmp_ele(node->val, val) == 0) {
+            cnt++;
+        }
+    }
+    return cnt;
 }
 
 // insert a node with the value "val" to the tail of the list
@@ -329,6 +347,20 @@ void remove_val(pList list, ele val) {
     }
 }
 
+// remove k-th node with the value "val"
+void remove_k(pList list, ele val, int k) {
+    int cnt = 0;
+    list_for_each_safe(list, node, next) {
+        if (cmp_ele(node->val, val) == 0) {
+            cnt++;
+            if (cnt == k) {
+                remove_node(list, node);
+                return;
+            }
+        }
+    }
+}
+
 // next node if the list is a cycle list
 // if the node is NULL, return the head node
 pNode cycle_next(pList list, pNode node) {
@@ -396,4 +428,45 @@ void concat(pList list1, pList list2) {
     list1->size += list2->size;
     list2->head = list2->tail = NULL;
     list2->size = 0;
+}
+
+// split the list at the position "pos"
+// return the list after the position "pos"
+// the list before the position "pos" will be the original list
+pList split(pList list, int pos) {
+    if (pos < 0 || pos >= list->size) {
+        printf("Error: split position out of range\n");
+        return NULL;
+    }
+    pList newList = createList();
+    if (pos == 0) {
+        newList->head = list->head;
+        newList->tail = list->tail;
+        newList->size = list->size;
+        list->head = list->tail = NULL;
+        list->size = 0;
+    } else if (pos == list->size - 1) {
+        newList->head = list->tail;
+        newList->tail = list->tail;
+        newList->size = 1;
+        list->tail = list->tail->prev;
+        list->tail->next = NULL;
+        list->size--;
+    } else {
+        pNode node = find_at(list, pos);
+        newList->head = node->next;
+        newList->tail = list->tail;
+        newList->size = list->size - pos;
+        list->tail = node;
+        list->tail->next = NULL;
+        list->size = pos;
+    }
+    return newList;
+}
+
+// free the list
+// free all nodes and the list itself
+void delete(pList list) {
+    clear(list);
+    free(list);
 }
