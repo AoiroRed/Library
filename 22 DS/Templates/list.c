@@ -98,7 +98,7 @@ void reverse(pList);
 void clear(pList);
 void concat(pList, pList);
 pList split(pList, int);
-void delete(pList);
+void free_list(pList);
 
 char num[10][10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 int main() {
@@ -466,7 +466,7 @@ pList split(pList list, int pos) {
 
 // free the list
 // free all nodes and the list itself
-void delete(pList list) {
+void free_list(pList list) {
     clear(list);
     free(list);
 }
