@@ -15,6 +15,7 @@ typedef int ele;
 typedef struct {
     ele *bottom, *top;
 } stack, *pStack;
+
 // 创建新栈，大小为 MAX_SIZE，返回栈的指针
 pStack new_stack() {
     pStack s = (pStack)malloc(sizeof(stack));
@@ -25,11 +26,19 @@ pStack new_stack() {
 }
 // 入栈，将 x 压入栈 s 中
 void push(pStack s, ele x) {
+    if (s->top - s->bottom == MAX_SIZE) {
+        printf("Stack is full!");
+        exit(1);
+    }
     *(s->top) = x;
     s->top++;
 }
 // 出栈，返回栈 s 的栈顶元素
 ele pop(pStack s) {
+    if (is_empty(s)) {
+        printf("Stack is empty!");
+        exit(1);
+    }
     s->top--;
     return *(s->top);
 }

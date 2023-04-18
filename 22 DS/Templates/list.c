@@ -3,11 +3,17 @@
 #include <string.h>
 
 // typedef int ele;
-// int cmp_ele(ele a, ele b) {
-//     if (a != b) {
-//         return a > b ? 1 : -1;
-//     }
-//     return 0;
+typedef char *ele;
+
+// return 1 if a > b, -1 if a < b, 0 if a == b
+int equal_ele(ele a, ele b);
+// copy the value of src to dest
+void copy_ele(ele *dest, ele src);
+// print the value of val
+void print_ele(ele val);
+
+// int equal_ele(ele a, ele b) {
+//     return a == b;
 // }
 // void copy_ele(ele *dest, ele src) {
 //     *dest = src;
@@ -16,8 +22,7 @@
 //     printf("%d ", val);
 // }
 
-typedef char *ele;
-int cmp_ele(ele a, ele b) {
+int equal_ele(ele a, ele b) {
     return strcmp(a, b);
 }
 void copy_ele(ele *dest, ele src) {
@@ -69,13 +74,14 @@ typedef struct {
         printf("\n");                                                                              \
     } while (0)
 
-pNode createNode(ele);
 pList createList();
 
+pNode get_head(pList);
+pNode get_tail(pList);
 pNode find(pList, ele);
 pNode find_k(pList, ele, int);
 pNode find_at(pList, int);
-pNode find_cmp(pList, ele, int (*)(ele, ele));
+pNode find_eq(pList, ele, int (*)(ele, ele));
 
 void insert_tail(pList, ele);
 void insert_head(pList, ele);
@@ -93,6 +99,8 @@ void remove_k(pList, ele, int);
 pNode cycle_next(pList, pNode);
 pNode cycle_prev(pList, pNode);
 
+int is_empty(pList);
+int size(pList);
 pList copy(pList);
 void reverse(pList);
 void clear(pList);
@@ -100,7 +108,24 @@ void concat(pList, pList);
 pList split(pList, int);
 void free_list(pList);
 
+#ifdef QUEUE
+typedef List Queue, *pQueue;
+pQueue createQueue();
+void enqueue(pQueue, ele);
+ele dequeue(pQueue);
+ele front(pQueue);
+#endif
+
+#ifdef STACK
+typedef List Stack, *pStack;
+pStack createStack();
+void push(pStack, ele);
+ele pop(pStack);
+ele top(pStack);
+#endif
+
 char num[10][10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+
 int main() {
     pList list = createList();
     for (int i = 0; i < 10; i++) {
@@ -147,11 +172,21 @@ pList createList() {
     return list;
 }
 
+// get the head of the list
+pNode get_head(pList list) {
+    return list->head;
+}
+
+// get the tail of the list
+pNode get_tail(pList list) {
+    return list->tail;
+}
+
 // find the k-th node with the value "val"
 pNode find_k(pList list, ele val, int k) {
     int cnt = 0;
     list_for_each(list, node) {
-        if (cmp_ele(node->val, val) == 0) {
+        if (equal_ele(node->val, val) == 0) {
             cnt++;
             if (cnt == k) {
                 return node;
@@ -161,10 +196,11 @@ pNode find_k(pList list, ele val, int k) {
     return NULL;
 }
 
-// find the first node with the value "val" using the function "cmp_user"
-pNode find_cmp(pList list, ele val, int (*cmp_user)(ele, ele)) {
+// find the first node with the value "val" using the function "equal_user"
+// the function "equal_user" should return 0 if the two values are equal
+pNode find_eq(pList list, ele val, int (*equal_user)(ele, ele)) {
     list_for_each(list, node) {
-        if (cmp_user(node->val, val) == 0) {
+        if (equal_user(node->val, val) == 0) {
             return node;
         }
     }
@@ -173,7 +209,7 @@ pNode find_cmp(pList list, ele val, int (*cmp_user)(ele, ele)) {
 
 // find the first node with the value "val"
 pNode find(pList list, ele val) {
-    return find_cmp(list, val, cmp_ele);
+    return find_eq(list, val, equal_ele);
 }
 
 // find the node at the index "index"
@@ -201,7 +237,7 @@ pNode find_at(pList list, int index) {
 int count(pList list, ele val) {
     int cnt = 0;
     list_for_each(list, node) {
-        if (cmp_ele(node->val, val) == 0) {
+        if (equal_ele(node->val, val) == 0) {
             cnt++;
         }
     }
@@ -341,7 +377,7 @@ void remove_at(pList list, int pos) {
 // remove all nodes with the value "val"
 void remove_val(pList list, ele val) {
     list_for_each_safe(list, node, next) {
-        if (cmp_ele(node->val, val) == 0) {
+        if (equal_ele(node->val, val) == 0) {
             remove_node(list, node);
         }
     }
@@ -351,7 +387,7 @@ void remove_val(pList list, ele val) {
 void remove_k(pList list, ele val, int k) {
     int cnt = 0;
     list_for_each_safe(list, node, next) {
-        if (cmp_ele(node->val, val) == 0) {
+        if (equal_ele(node->val, val) == 0) {
             cnt++;
             if (cnt == k) {
                 remove_node(list, node);
@@ -377,6 +413,16 @@ pNode cycle_prev(pList list, pNode node) {
         return list->tail;
     }
     return node->prev == NULL ? list->tail : node->prev;
+}
+
+// return 1 if the list is empty, otherwise return 0
+int is_empty(pList list) {
+    return list->size == 0;
+}
+
+// return the size of the list
+int size(pList list) {
+    return list->size;
 }
 
 // copy the list
@@ -470,3 +516,45 @@ void free_list(pList list) {
     clear(list);
     free(list);
 }
+
+#ifdef QUEUE
+pQueue createQueue() {
+    return createList();
+}
+ele front(pQueue queue) {
+    if (queue->size == 0) {
+        printf("Error: queue is empty\n");
+        return 0;
+    }
+    return queue->head->val;
+}
+void enqueue(pQueue queue, ele val) {
+    insert_tail(queue, val);
+}
+ele dequeue(pQueue queue) {
+    ele val = front(queue);
+    remove_head(queue);
+    return val;
+}
+#endif
+
+#ifdef STACK
+pStack createStack() {
+    return createList();
+}
+ele top(pStack stack) {
+    if (stack->size == 0) {
+        printf("Error: stack is empty\n");
+        return 0;
+    }
+    return stack->head->val;
+}
+void push(pStack stack, ele val) {
+    insert_head(stack, val);
+}
+ele pop(pStack stack) {
+    ele val = top(stack);
+    remove_head(stack);
+    return val;
+}
+#endif
