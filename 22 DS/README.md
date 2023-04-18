@@ -5,6 +5,7 @@
 - `Archive` 下为 pdf 版本，可能更新不及时。
 - `Ref` 中包含可能会需要查找的一些内容。
 - `Templates` 中包含一些可能会用到的板子。
+- `Simtool_debug` 中为大作业 debug 辅助工具。
 
 有疑问可以提 `issue` 或邮件联系。
 
