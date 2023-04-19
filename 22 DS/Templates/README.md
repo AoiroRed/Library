@@ -6,7 +6,7 @@
   
   自定义数据类型，需要实现复制、比较、打印函数。
 
-  可通过在头部添加 `#define STACK 1` 或 `#define QUEUE 1` 开启模拟栈/队列模式。
+  可通过在头部添加 `#define STACK` 或 `#define QUEUE` 开启模拟栈/队列模式。
   
 - stack.c：本质为数组栈。
   

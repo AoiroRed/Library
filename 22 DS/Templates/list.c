@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define STACK
+#define QUEUE
+
 // typedef int ele;
 typedef char *ele;
 
@@ -26,7 +29,7 @@ int equal_ele(ele a, ele b) {
     return strcmp(a, b);
 }
 void copy_ele(ele *dest, ele src) {
-    *dest = (ele)malloc(strlen(src) + 1);
+    *dest = (char *)malloc(sizeof(char) * (strlen(src) + 1));
     strcpy(*dest, src);
 }
 void print_ele(ele val) {
@@ -37,6 +40,8 @@ typedef struct node {
     ele val;
     struct node *next, *prev;
 } Node, *pNode;
+
+pNode new_node(ele);
 
 typedef struct {
     pNode head, tail;
@@ -65,16 +70,8 @@ typedef struct {
     for (pNode node = list->head, next = node == NULL ? NULL : node->next; node != NULL;           \
          node = next, next = node == NULL ? NULL : node->next)
 
-// print the list
-#define print_list(list)                                                                           \
-    do {                                                                                           \
-        list_for_each(list, node) {                                                                \
-            print_ele(node->val);                                                                  \
-        }                                                                                          \
-        printf("\n");                                                                              \
-    } while (0)
-
 pList new_list();
+pList new_list_from_array(ele *, int);
 
 pNode get_head(pList);
 pNode get_tail(pList);
@@ -99,6 +96,7 @@ void remove_k(pList, ele, int);
 pNode cycle_next(pList, pNode);
 pNode cycle_prev(pList, pNode);
 
+void print_list(pList);
 int is_empty(pList);
 int size(pList);
 pList copy(pList);
@@ -118,19 +116,53 @@ ele front(pQueue);
 
 #ifdef STACK
 typedef List Stack, *pStack;
-pStack new_Stack();
+pStack new_stack();
 void push(pStack, ele);
 ele pop(pStack);
 ele top(pStack);
 #endif
 
-char num[10][10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+char *num[10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 
 int main() {
-    pList list = new_list();
+
+#ifdef STACK
+    /* Stack Test */
+    printf("Stack Test\n");
+    pStack stack = new_stack();
     for (int i = 0; i < 10; i++) {
-        insert_tail(list, num[i]);
+        push(stack, num[i]);
     }
+    print_list(stack);
+    for (int i = 0; i < 10; i++) {
+        printf("%s ", pop(stack));
+    }
+    printf("\n\n");
+    free_list(stack);
+#endif
+
+#ifdef QUEUE
+    /* Queue Test */
+    printf("Queue Test\n");
+    pQueue queue = new_queue();
+    for (int i = 0; i < 10; i++) {
+        enqueue(queue, num[i]);
+    }
+    print_list(queue);
+    for (int i = 0; i < 10; i++) {
+        printf("%s ", dequeue(queue));
+    }
+    printf("\n\n");
+#endif
+    /* List Test */
+    printf("List Test\n");
+    pList list = new_list_from_array(num, 10);
+    /*
+        num here is an one-dimensional array.
+        if you use char num_two[10][10] = {"zero", "one", ...} here,
+        the func cannot infer the size of the elements in the array.
+        Because the size of the elements is expected to be sizeof(ele) = sizeof(char*).
+    */
     print_list(list);
 
     remove_at(list, 3);
@@ -157,14 +189,28 @@ int main() {
 
     reverse(list);
     print_list(list);
-    
+
     clear(list);
+
     return 0;
 }
 
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+/* --------------------------------------------------------------- */
+
 // create a node, return the pointer to the node
 // not used by user
-pNode createNode(ele val) {
+pNode new_node(ele val) {
     pNode node = (pNode)malloc(sizeof(Node));
     copy_ele(&node->val, val);
     node->next = node->prev = NULL;
@@ -176,6 +222,17 @@ pList new_list() {
     pList list = (pList)malloc(sizeof(List));
     list->head = list->tail = NULL;
     list->size = 0;
+    return list;
+}
+
+// create a list from an array, return the pointer to the list
+// the length of the array is "len"
+// Note: the array should be a one-dimensional array
+pList new_list_from_array(ele *arr, int len) {
+    pList list = new_list();
+    for (int i = 0; i < len; i++) {
+        insert_tail(list, arr[i]);
+    }
     return list;
 }
 
@@ -253,7 +310,7 @@ int count(pList list, ele val) {
 
 // insert a node with the value "val" to the tail of the list
 void insert_tail(pList list, ele val) {
-    pNode node = createNode(val);
+    pNode node = new_node(val);
     if (list->size == 0) {
         list->head = list->tail = node;
     } else {
@@ -266,7 +323,7 @@ void insert_tail(pList list, ele val) {
 
 // insert a node with the value "val" to the head of the list
 void insert_head(pList list, ele val) {
-    pNode node = createNode(val);
+    pNode node = new_node(val);
     if (list->size == 0) {
         list->head = list->tail = node;
     } else {
@@ -282,7 +339,7 @@ void insert_before(pList list, pNode node, ele val) {
     if (node == list->head) {
         insert_head(list, val);
     } else {
-        pNode newNode = createNode(val);
+        pNode newNode = new_node(val);
         newNode->next = node;
         newNode->prev = node->prev;
         node->prev->next = newNode;
@@ -296,7 +353,7 @@ void insert_after(pList list, pNode node, ele val) {
     if (node == list->tail) {
         insert_tail(list, val);
     } else {
-        pNode newNode = createNode(val);
+        pNode newNode = new_node(val);
         newNode->next = node->next;
         newNode->prev = node;
         node->next->prev = newNode;
@@ -422,6 +479,14 @@ pNode cycle_prev(pList list, pNode node) {
     return node->prev == NULL ? list->tail : node->prev;
 }
 
+// print the list
+void print_list(pList list) {
+    list_for_each(list, node) {
+        print_ele(node->val);
+    }
+    printf("\n");
+}
+
 // return 1 if the list is empty, otherwise return 0
 int is_empty(pList list) {
     return list->size == 0;
@@ -526,7 +591,7 @@ void free_list(pList list) {
 
 #ifdef QUEUE
 pQueue new_queue() {
-    return createList();
+    return new_list();
 }
 ele front(pQueue queue) {
     if (queue->size == 0) {
@@ -546,22 +611,22 @@ ele dequeue(pQueue queue) {
 #endif
 
 #ifdef STACK
-pStack new_Stack() {
-    return createList();
+pStack new_stack() {
+    return new_list();
 }
 ele top(pStack stack) {
     if (stack->size == 0) {
         printf("Error: stack is empty\n");
         return 0;
     }
-    return stack->head->val;
+    return stack->tail->val;
 }
 void push(pStack stack, ele val) {
-    insert_head(stack, val);
+    insert_tail(stack, val);
 }
 ele pop(pStack stack) {
     ele val = top(stack);
-    remove_head(stack);
+    remove_tail(stack);
     return val;
 }
 #endif
