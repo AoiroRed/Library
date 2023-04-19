@@ -132,8 +132,10 @@ int main() {
         insert_tail(list, num[i]);
     }
     print_list(list);
+
     remove_at(list, 3);
     print_list(list);
+
     insert_head(list, "HEAD");
     insert_after(list, find(list, "five"), "{AFTER five}");
     insert_before(list, find_at(list, 2), "{BEFORE loc 2}");
@@ -142,15 +144,20 @@ int main() {
     insert_tail(list, "five");
     insert_tail(list, "five");
     print_list(list);
+
     remove_val(list, "five");
     print_list(list);
+
     pList list2 = split(list, 5);
     print_list(list);
     print_list(list2);
+
     concat(list, list2);
     print_list(list);
+
     reverse(list);
     print_list(list);
+    
     clear(list);
     return 0;
 }
