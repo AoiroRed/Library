@@ -74,7 +74,7 @@ typedef struct {
         printf("\n");                                                                              \
     } while (0)
 
-pList createList();
+pList new_list();
 
 pNode get_head(pList);
 pNode get_tail(pList);
@@ -110,7 +110,7 @@ void free_list(pList);
 
 #ifdef QUEUE
 typedef List Queue, *pQueue;
-pQueue createQueue();
+pQueue new_queue();
 void enqueue(pQueue, ele);
 ele dequeue(pQueue);
 ele front(pQueue);
@@ -118,7 +118,7 @@ ele front(pQueue);
 
 #ifdef STACK
 typedef List Stack, *pStack;
-pStack createStack();
+pStack new_Stack();
 void push(pStack, ele);
 ele pop(pStack);
 ele top(pStack);
@@ -127,7 +127,7 @@ ele top(pStack);
 char num[10][10] = {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
 
 int main() {
-    pList list = createList();
+    pList list = new_list();
     for (int i = 0; i < 10; i++) {
         insert_tail(list, num[i]);
     }
@@ -165,7 +165,7 @@ pNode createNode(ele val) {
 }
 
 // create a list, return the pointer to the list
-pList createList() {
+pList new_list() {
     pList list = (pList)malloc(sizeof(List));
     list->head = list->tail = NULL;
     list->size = 0;
@@ -427,7 +427,7 @@ int size(pList list) {
 
 // copy the list
 pList copy(pList list) {
-    pList newList = createList();
+    pList newList = new_list();
     list_for_each(list, node) {
         insert_tail(newList, node->val);
     }
@@ -484,7 +484,7 @@ pList split(pList list, int pos) {
         printf("Error: split position out of range\n");
         return NULL;
     }
-    pList newList = createList();
+    pList newList = new_list();
     if (pos == 0) {
         newList->head = list->head;
         newList->tail = list->tail;
@@ -518,7 +518,7 @@ void free_list(pList list) {
 }
 
 #ifdef QUEUE
-pQueue createQueue() {
+pQueue new_queue() {
     return createList();
 }
 ele front(pQueue queue) {
@@ -539,7 +539,7 @@ ele dequeue(pQueue queue) {
 #endif
 
 #ifdef STACK
-pStack createStack() {
+pStack new_Stack() {
     return createList();
 }
 ele top(pStack stack) {
