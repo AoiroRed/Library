@@ -289,7 +289,7 @@ pNode find_at(pList list, int index) {
             node = node->next;
         }
     } else {
-        pNode node = list->tail;
+        node = list->tail;
         for (int i = list->size - 1; i > index; i--) {
             node = node->prev;
         }
@@ -376,7 +376,7 @@ void insert_at(pList list, int pos, ele val) {
     }
 }
 
-// remove the head node
+// remove the head node and free the memory
 void remove_head(pList list) {
     if (list->size == 0) {
         printf("Error: list is empty\n");
@@ -393,7 +393,7 @@ void remove_head(pList list) {
     list->size--;
 }
 
-// remove the tail node
+// remove the tail node and free the memory
 void remove_tail(pList list) {
     if (list->size == 0) {
         printf("Error: list is empty\n");
@@ -410,7 +410,7 @@ void remove_tail(pList list) {
     list->size--;
 }
 
-// remove the node "node"
+// remove the node "node" and free the memory
 void remove_node(pList list, pNode node) {
     if (list->size == 0) {
         printf("Error: list is empty\n");
